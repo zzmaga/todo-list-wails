@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"todo-list-wails/backend/models"
@@ -14,6 +15,7 @@ type TaskUsecase struct {
 	repo repo.TaskRepo
 }
 
+// Const
 func NewTaskUsecase(r repo.TaskRepo) *TaskUsecase {
 	return &TaskUsecase{repo: r}
 }
@@ -37,6 +39,7 @@ func (u *TaskUsecase) Add(ctx context.Context, title string, due *time.Time, p m
 func (u *TaskUsecase) Toggle(ctx context.Context, id string) error {
 	t, err := u.repo.Get(ctx, id)
 	if err != nil {
+		log.Fatal(err)
 		return err
 	}
 	t.Done = !t.Done
