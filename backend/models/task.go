@@ -6,9 +6,9 @@ import "time"
 type Priority string
 
 const (
-	PriorityLow    Priority = "low"    // Низкий приоритет
-	PriorityMedium Priority = "medium" // Средний приоритет
-	PriorityHigh   Priority = "high"   // Высокий приоритет
+	PriorityLow    Priority = "low"
+	PriorityMedium Priority = "medium"
+	PriorityHigh   Priority = "high"
 )
 
 // Task представляет задачу в системе

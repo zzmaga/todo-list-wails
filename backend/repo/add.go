@@ -5,14 +5,13 @@ import (
 	"todo-list-wails/backend/models"
 )
 
-// Add добавляет новую задачу в файл
+// Add добавляет новую задачу
 func (r *FileRepo) Add(ctx context.Context, task models.Task) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	tasks, err := r.readAll()
 	if err != nil {
 		return err
 	}
+
 	tasks = append(tasks, task)
 	return r.writeAll(tasks)
 }

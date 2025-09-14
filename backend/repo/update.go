@@ -6,19 +6,19 @@ import (
 	"todo-list-wails/backend/models"
 )
 
-// Update обновляет существующую задачу в файле
-func (r *FileRepo) Update(ctx context.Context, t models.Task) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+// Update обновляет существующую задачу
+func (r *FileRepo) Update(ctx context.Context, task models.Task) error {
 	tasks, err := r.readAll()
 	if err != nil {
 		return err
 	}
-	for i, it := range tasks {
-		if it.ID == t.ID {
-			tasks[i] = t
+
+	for i, t := range tasks {
+		if t.ID == task.ID {
+			tasks[i] = task
 			return r.writeAll(tasks)
 		}
 	}
+
 	return os.ErrNotExist
 }

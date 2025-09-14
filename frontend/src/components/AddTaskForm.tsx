@@ -10,11 +10,30 @@ export default function AddTaskForm({ onAdd }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [due, setDue] = useState<string>('');
   const [priority, setPriority] = useState<Priority>('medium');
+  const [error, setError] = useState<string>('');
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = title.trim();
-    if (!trimmed) return; // валидация пустого ввода
+    
+    // Валидация
+    if (!trimmed) {
+      setError('Название задачи не может быть пустым');
+      return;
+    }
+    
+    if (trimmed.length > 200) {
+      setError('Название задачи слишком длинное (максимум 200 символов)');
+      return;
+    }
+    
+    // Проверка дедлайна
+    if (due && new Date(due) < new Date()) {
+      setError('Дедлайн не может быть в прошлом');
+      return;
+    }
+    
+    setError(''); // Очищаем ошибку при успешной валидации
     onAdd(trimmed, due ? new Date(due).toISOString() : undefined, priority);
     setTitle(''); 
     setDue(''); 
@@ -26,6 +45,7 @@ export default function AddTaskForm({ onAdd }: AddTaskFormProps) {
     setTitle('');
     setDue('');
     setPriority('medium');
+    setError('');
     setIsExpanded(false);
   };
 
@@ -37,7 +57,7 @@ export default function AddTaskForm({ onAdd }: AddTaskFormProps) {
           className="btn primary add-btn" 
           onClick={() => setIsExpanded(true)}
         >
-          ➕ Добавить задачу
+          <span className="icon">+</span> Добавить задачу
         </button>
       </div>
     );
@@ -47,54 +67,53 @@ export default function AddTaskForm({ onAdd }: AddTaskFormProps) {
   return (
     <div className="add-task-form-container">
       <form className="add-form" onSubmit={submit}>
-        <div className="form-header">
-          <h3>Новая задача</h3>
-          <button 
-            type="button" 
-            className="btn icon" 
-            onClick={cancel}
-            title="Отмена"
-          >
-            ✕
-          </button>
-        </div>
         
         <div className="form-fields">
           <input 
-            className="input" 
+            className={`input ${error ? 'error' : ''}`}
             placeholder="Введите название задачи..." 
             value={title} 
-            onChange={e => setTitle(e.target.value)}
+            onChange={e => {
+              setTitle(e.target.value);
+              if (error) setError(''); // Очищаем ошибку при вводе
+            }}
             autoFocus
           />
+          {error && <div className="error-message">{error}</div>}
           
           <div className="form-row">
-            <input 
-              type="datetime-local" 
-              value={due} 
-              onChange={e => setDue(e.target.value)} 
-              title="Дедлайн (необязательно)"
-              className="input"
-            />
+            <div className="input-group">
+              <label className="input-label">Дедлайн:</label>
+              <input 
+                type="datetime-local" 
+                value={due} 
+                onChange={e => setDue(e.target.value)} 
+                title="Дедлайн (необязательно)"
+                className="input"
+              />
+            </div>
             
-            <select 
-              value={priority} 
-              onChange={e => setPriority(e.target.value as Priority)}
-              className="input"
-            >
-              <option value="low">🟢 Низкий</option>
-              <option value="medium">🟡 Средний</option>
-              <option value="high">🔴 Высокий</option>
-            </select>
+            <div className="input-group">
+              <label className="input-label">Приоритет:</label>
+              <select 
+                value={priority} 
+                onChange={e => setPriority(e.target.value as Priority)}
+                className="input"
+              >
+                <option value="low">● Низкий</option>
+                <option value="medium">● Средний</option>
+                <option value="high">● Высокий</option>
+              </select>
+            </div>
           </div>
         </div>
         
         <div className="form-actions">
-          <button type="button" className="btn" onClick={cancel}>
-            Отмена
+          <button type="button" className="btn cancel-btn" onClick={cancel}>
+            <span className="icon">↩</span> Отмена
           </button>
           <button className="btn primary" type="submit">
-            ✅ Добавить задачу
+            <span className="icon">✓</span> Добавить задачу
           </button>
         </div>
       </form>

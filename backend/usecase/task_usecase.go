@@ -10,53 +10,46 @@ import (
 	"github.com/google/uuid"
 )
 
-// TaskUsecase содержит бизнес-логику для работы с задачами
-// Реализует слой usecase в архитектуре Clean Architecture
 type TaskUsecase struct {
-	repo repo.TaskRepo // репозиторий для работы с данными
+	repo repo.TaskRepo
 }
 
-// NewTaskUsecase создает новый экземпляр TaskUsecase
 func NewTaskUsecase(r repo.TaskRepo) *TaskUsecase {
 	return &TaskUsecase{repo: r}
 }
 
-// List возвращает список всех задач
+// List - список всех задач
 func (u *TaskUsecase) List(ctx context.Context) ([]models.Task, error) {
 	return u.repo.List(ctx)
 }
 
-// Add создает новую задачу с указанными параметрами
-// Генерирует уникальный ID и устанавливает время создания
+// Создаем новую задачу с указанными параметрами
 func (u *TaskUsecase) Add(ctx context.Context, title string, due *time.Time, p models.Priority) (models.Task, error) {
-	t := models.Task{
-		ID:        uuid.NewString(), // генерируем уникальный ID
+	task := models.Task{
+		ID:        uuid.NewString(),
 		Title:     title,
-		Done:      false,      // новая задача всегда не выполнена
-		CreatedAt: time.Now(), // устанавливаем текущее время
+		Done:      false,
+		CreatedAt: time.Now(),
 		DueAt:     due,
 		Priority:  p,
 	}
-	return t, u.repo.Add(ctx, t)
+	return task, u.repo.Add(ctx, task)
 }
 
 // Toggle переключает статус выполнения задачи
-// Получает задачу по ID, инвертирует статус и сохраняет изменения
 func (u *TaskUsecase) Toggle(ctx context.Context, id string) error {
-	t, err := u.repo.Get(ctx, id)
+	task, err := u.repo.Get(ctx, id)
 	if err != nil {
 		return err
 	}
-	t.Done = !t.Done // инвертируем статус выполнения
-	return u.repo.Update(ctx, *t)
+	task.Done = !task.Done
+	return u.repo.Update(ctx, *task)
 }
 
-// Update обновляет существующую задачу
-func (u *TaskUsecase) Update(ctx context.Context, t models.Task) error {
-	return u.repo.Update(ctx, t)
+func (u *TaskUsecase) Update(ctx context.Context, task models.Task) error {
+	return u.repo.Update(ctx, task)
 }
 
-// Delete удаляет задачу по ID
 func (u *TaskUsecase) Delete(ctx context.Context, id string) error {
 	return u.repo.Delete(ctx, id)
 }

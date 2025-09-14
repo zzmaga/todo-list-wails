@@ -24,29 +24,14 @@ func NewApp(cfg Config) *App {
 }
 
 // Startup инициализирует приложение при запуске
-// Настраивает репозиторий (файловый или PostgreSQL) и сервисы
+// Настраивает файловый репозиторий и сервисы
 func (a *App) Startup(ctx context.Context) {
-	var err error
-
-	// Выбираем тип репозитория на основе конфигурации
-	switch a.Cfg.Database.Type {
-	case "postgres":
-		// PostgreSQL репозиторий
-		connStr := a.Cfg.Database.Postgres.GetConnectionString()
-		a.repo, err = repo.NewPostgresRepo(connStr)
-		if err != nil {
-			log.Printf("Failed to connect to PostgreSQL, falling back to file storage: %v", err)
-			// Fallback на файловый репозиторий
-			a.repo, _ = repo.NewFileRepo(a.Cfg.AppName)
-		}
-	default:
-		// Файловый репозиторий (по умолчанию)
-		a.repo, err = repo.NewFileRepo(a.Cfg.AppName)
-		if err != nil {
-			log.Printf("Failed to create file repo: %v", err)
-			return
-		}
+	// Создаем файловый репозиторий
+	fileRepo, err := repo.NewFileRepo(a.Cfg.AppName)
+	if err != nil {
+		log.Fatalf("Failed to create file repo: %v", err)
 	}
+	a.repo = fileRepo
 
 	// Создаем usecase и service
 	uc := usecase.NewTaskUsecase(a.repo)

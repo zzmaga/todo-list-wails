@@ -13,6 +13,15 @@ export default function TaskItem({ t, onToggle, onDelete }: TaskItemProps) {
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
+    // Для даты создания показываем только дату
+    if (dateString === t.createdAt) {
+      return date.toLocaleDateString('ru-RU', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+    }
+    
+    // Для дедлайна показываем относительное время
     if (diffDays === 0) return 'Сегодня';
     if (diffDays === 1) return 'Завтра';
     if (diffDays === -1) return 'Вчера';
@@ -29,25 +38,25 @@ export default function TaskItem({ t, onToggle, onDelete }: TaskItemProps) {
         onClick={() => onToggle(t.id)}
         title={t.done ? 'Отметить как невыполненную' : 'Отметить как выполненную'}
       >
-        {t.done ? '✅' : '⭕'}
+        <span className="icon">{t.done ? '✓' : '○'}</span>
       </button>
       
       <div className="meta">
         <div className="title">
           <span className={`priority-badge ${t.priority}`}>
-            {t.priority === 'high' ? '🔴' : t.priority === 'medium' ? '🟡' : '🟢'}
+            {t.priority === 'high' ? '●' : t.priority === 'medium' ? '●' : '●'}
           </span>
           <span className="task-title">{t.title}</span>
-          {isOverdue && <span className="overdue-badge">⚠️ Просрочено</span>}
+          {isOverdue && <span className="overdue-badge">! Просрочено</span>}
         </div>
         
         <div className="sub">
           <span className="created-date">
-            📅 {formatDate(t.createdAt)}
+            <span className="icon">📅</span> {formatDate(t.createdAt)}
           </span>
           {t.dueAt && (
             <span className={`due-date ${isOverdue ? 'overdue' : ''}`}>
-              ⏰ {formatDate(t.dueAt)}
+              <span className="icon">⏰</span> {formatDate(t.dueAt)}
             </span>
           )}
         </div>
@@ -58,7 +67,7 @@ export default function TaskItem({ t, onToggle, onDelete }: TaskItemProps) {
         title="Удалить задачу" 
         onClick={() => onDelete(t.id)}
       >
-        🗑️
+        <span className="icon">🗑</span>
       </button>
     </div>
   );

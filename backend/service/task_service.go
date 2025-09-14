@@ -7,7 +7,6 @@ import (
 	"todo-list-wails/backend/usecase"
 )
 
-// TaskService содержит сервисный слой для работы с задачами
 type TaskService struct {
 	u *usecase.TaskUsecase
 }
@@ -25,9 +24,4 @@ func (s *TaskService) List(ctx context.Context) ([]models.Task, error) {
 // Toggle переключает статус выполнения задачи
 func (s *TaskService) Toggle(ctx context.Context, id string) error {
 	return s.u.Toggle(ctx, id)
-}
-
-// Update обновляет существующую задачу
-func (s *TaskService) Update(ctx context.Context, t models.Task) error {
-	return s.u.Update(ctx, t)
 }

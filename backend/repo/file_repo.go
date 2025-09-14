@@ -3,80 +3,71 @@ package repo
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"path/filepath"
-	"runtime"
-	"sync"
 
 	"todo-list-wails/backend/models"
 )
 
-// FileRepo реализует TaskRepo интерфейс для файлового хранения
-// Сохраняет задачи в JSON файл в пользовательской директории
+// FileRepo реализует TaskRepo для файлового хранения
 type FileRepo struct {
-	path string     // путь к файлу с данными
-	mu   sync.Mutex // мьютекс для безопасного доступа к файлу
+	filename string
 }
 
-// NewFileRepo создает новый экземпляр FileRepo
-// Создает директорию для данных приложения и файл tasks.json если его нет
 func NewFileRepo(appName string) (*FileRepo, error) {
-	dir := userDataDir(appName)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return nil, err
-	}
-	p := filepath.Join(dir, "tasks.json")
-	if _, err := os.Stat(p); errors.Is(err, os.ErrNotExist) {
-		_ = os.WriteFile(p, []byte("[]"), 0o644)
-	}
-	return &FileRepo{path: p}, nil
-}
-
-// userDataDir возвращает путь к пользовательской директории данных
-// для разных операционных систем
-func userDataDir(appName string) string {
-	switch runtime.GOOS {
-	case "windows":
-		base := os.Getenv("AppData")
-		if base == "" {
-			base = "."
-		}
-		return filepath.Join(base, appName)
-	case "darwin":
-		home, _ := os.UserHomeDir()
-		return filepath.Join(home, "Library", "Application Support", appName)
-	default:
-		home, _ := os.UserHomeDir()
-		return filepath.Join(home, ".config", appName)
-	}
-}
-
-// readAll читает все задачи из JSON файла
-func (r *FileRepo) readAll() ([]models.Task, error) {
-	b, err := os.ReadFile(r.path)
+	dir, err := userDataDir(appName)
 	if err != nil {
 		return nil, err
 	}
-	var tasks []models.Task
-	if err := json.Unmarshal(b, &tasks); err != nil {
+
+	filename := filepath.Join(dir, "tasks.json")
+	return &FileRepo{filename: filename}, nil
+}
+
+// userDataDir возвращает путь к директории данных пользователя
+func userDataDir(appName string) (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	dir := filepath.Join(home, "Library", "Application Support", appName)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
+	}
+
+	return dir, nil
+}
+
+// readAll читает все задачи из файла
+func (r *FileRepo) readAll() ([]models.Task, error) {
+	data, err := os.ReadFile(r.filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []models.Task{}, nil
+		}
 		return nil, err
 	}
+
+	var tasks []models.Task
+	if err := json.Unmarshal(data, &tasks); err != nil {
+		return nil, err
+	}
+
 	return tasks, nil
 }
 
-// writeAll записывает все задачи в JSON файл
+// writeAll записывает все задачи в файл
 func (r *FileRepo) writeAll(tasks []models.Task) error {
-	b, err := json.MarshalIndent(tasks, "", "  ")
+	data, err := json.MarshalIndent(tasks, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(r.path, b, 0o644)
+
+	return os.WriteFile(r.filename, data, 0644)
 }
 
-// List возвращает список всех задач из файла
+// List возвращает список всех задач
 func (r *FileRepo) List(ctx context.Context) ([]models.Task, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	return r.readAll()
 }

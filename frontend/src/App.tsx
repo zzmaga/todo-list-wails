@@ -89,45 +89,96 @@ export default function App() {
         <div>Загрузка…</div>
       ) : (
         <div className="columns">
-          <div className="task-column">
-            <div className="column-header">
-              <h2>⏳ Активные задачи</h2>
-              <span className="task-count">{active.length}</span>
-            </div>
-            {active.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">📝</div>
-                <div className="empty-text">Нет активных задач</div>
-                <div className="empty-subtext">Нажмите "Добавить задачу" чтобы создать первую</div>
+          {/* Показываем колонки в зависимости от фильтра */}
+          {filter === 'all' && (
+            <>
+              <div className="task-column">
+                <div className="column-header">
+                  <h2>⏳ Активные задачи</h2>
+                  <span className="task-count">{active.length}</span>
+                </div>
+                {active.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">📝</div>
+                    <div className="empty-text">Нет активных задач</div>
+                    <div className="empty-subtext">Нажмите "Добавить задачу" чтобы создать первую</div>
+                  </div>
+                ) : (
+                  <div className="task-list">
+                    {active.map((t) => (
+                      <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
+                    ))}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="task-list">
-                {active.map((t) => (
-                  <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
-                ))}
+              
+              <div className="task-column">
+                <div className="column-header">
+                  <h2>✅ Выполненные задачи</h2>
+                  <span className="task-count">{done.length}</span>
+                </div>
+                {done.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">🎯</div>
+                    <div className="empty-text">Нет выполненных задач</div>
+                    <div className="empty-subtext">Отмечайте задачи как выполненные</div>
+                  </div>
+                ) : (
+                  <div className="task-list">
+                    {done.map((t) => (
+                      <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
           
-          <div className="task-column">
-            <div className="column-header">
-              <h2>✅ Выполненные задачи</h2>
-              <span className="task-count">{done.length}</span>
+          {/* Показываем только активные задачи */}
+          {filter === 'active' && (
+            <div className="task-column single-column">
+              <div className="column-header">
+                <h2>⏳ Активные задачи</h2>
+                <span className="task-count">{active.length}</span>
+              </div>
+              {active.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">📝</div>
+                  <div className="empty-text">Нет активных задач</div>
+                  <div className="empty-subtext">Нажмите "Добавить задачу" чтобы создать первую</div>
+                </div>
+              ) : (
+                <div className="task-list">
+                  {active.map((t) => (
+                    <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
+                  ))}
+                </div>
+              )}
             </div>
-            {done.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">🎯</div>
-                <div className="empty-text">Нет выполненных задач</div>
-                <div className="empty-subtext">Отмечайте задачи как выполненные</div>
+          )}
+          
+          {/* Показываем только выполненные задачи */}
+          {filter === 'done' && (
+            <div className="task-column single-column">
+              <div className="column-header">
+                <h2>✅ Выполненные задачи</h2>
+                <span className="task-count">{done.length}</span>
               </div>
-            ) : (
-              <div className="task-list">
-                {done.map((t) => (
-                  <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
-                ))}
-              </div>
-            )}
-          </div>
+              {done.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">🎯</div>
+                  <div className="empty-text">Нет выполненных задач</div>
+                  <div className="empty-subtext">Отмечайте задачи как выполненные</div>
+                </div>
+              ) : (
+                <div className="task-list">
+                  {done.map((t) => (
+                    <TaskItem key={t.id} t={t} onToggle={toggle} onDelete={onDelete} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

@@ -2,22 +2,22 @@ package repo
 
 import (
 	"context"
-	"todo-list-wails/backend/models"
+	"os"
 )
 
-// Delete удаляет задачу из файла
+// Delete удаляет задачу по ID
 func (r *FileRepo) Delete(ctx context.Context, id string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 	tasks, err := r.readAll()
 	if err != nil {
 		return err
 	}
-	out := make([]models.Task, 0, len(tasks))
-	for _, task := range tasks {
-		if task.ID != id {
-			out = append(out, task)
+
+	for i, task := range tasks {
+		if task.ID == id {
+			tasks = append(tasks[:i], tasks[i+1:]...)
+			return r.writeAll(tasks)
 		}
 	}
-	return r.writeAll(out)
+
+	return os.ErrNotExist
 }
