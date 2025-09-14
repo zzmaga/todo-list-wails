@@ -24,14 +24,10 @@ func NewFileRepo(appName string) (*FileRepo, error) {
 	return &FileRepo{filename: filename}, nil
 }
 
-// userDataDir возвращает путь к директории данных пользователя
+// userDataDir возвращает путь к директории данных в проекте
 func userDataDir(appName string) (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	dir := filepath.Join(home, "Library", "Application Support", appName)
+	// Создаем папку data в корне проекта
+	dir := "data"
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", err
 	}
