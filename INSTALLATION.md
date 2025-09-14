@@ -28,46 +28,18 @@ sudo apt-get install -y nodejs
 sudo apt-get install git
 ```
 
-# Установка Node.js
-curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-sudo yum install -y nodejs
-
-### Шаг 2: Установка Wails
-```bash
-go install github.com/wailsapp/wails/v2/cmd/wails@latest
-```
-
 ### Шаг 3: Установка зависимостей
-
-#### Backend (Go модули)
-```bash
-go mod tidy
-```
-
-#### Frontend (Node.js пакеты)
-```bash
-cd frontend
-npm install
-cd ..
-```
+go mod tidy && cd frontend && npm install && cd ..
 
 ### Шаг 4: Сборка фронтенда
-```bash
-cd frontend
-npm run build
-cd ..
-```
+cd frontend && npm run build && cd ..
 
 ### Шаг 5: Запуск приложения
 
 #### Вариант A: Режим разработки (рекомендуется)
-```bash
 wails dev
-```
 
 #### Вариант B: Сборка готового приложения
-```bash
-# Сборка
 wails build
 
 # Запуск (Windows)
@@ -89,7 +61,7 @@ go version
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
 # Добавьте Go bin в PATH (если нужно)
-echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
+export PATH=$PATH:$(go env GOPATH)/bin >> ~/.bashrc
 source ~/.bashrc
 ```
 
