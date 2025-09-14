@@ -6,6 +6,7 @@ import (
 	"todo-list-wails/backend/models"
 )
 
+// Update обновляет существующую задачу в файле
 func (r *FileRepo) Update(ctx context.Context, t models.Task) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()

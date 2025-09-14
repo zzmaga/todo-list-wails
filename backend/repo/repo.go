@@ -5,6 +5,8 @@ import (
 	"todo-list-wails/backend/models"
 )
 
+// TaskRepo определяет интерфейс для работы с задачами
+// Позволяет использовать разные реализации хранения (файл, БД)
 type TaskRepo interface {
 	List(ctx context.Context) ([]models.Task, error)
 	Get(ctx context.Context, id string) (*models.Task, error)

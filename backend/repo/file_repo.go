@@ -12,11 +12,15 @@ import (
 	"todo-list-wails/backend/models"
 )
 
+// FileRepo реализует TaskRepo интерфейс для файлового хранения
+// Сохраняет задачи в JSON файл в пользовательской директории
 type FileRepo struct {
-	path string
-	mu   sync.Mutex
+	path string     // путь к файлу с данными
+	mu   sync.Mutex // мьютекс для безопасного доступа к файлу
 }
 
+// NewFileRepo создает новый экземпляр FileRepo
+// Создает директорию для данных приложения и файл tasks.json если его нет
 func NewFileRepo(appName string) (*FileRepo, error) {
 	dir := userDataDir(appName)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
@@ -29,6 +33,8 @@ func NewFileRepo(appName string) (*FileRepo, error) {
 	return &FileRepo{path: p}, nil
 }
 
+// userDataDir возвращает путь к пользовательской директории данных
+// для разных операционных систем
 func userDataDir(appName string) string {
 	switch runtime.GOOS {
 	case "windows":
@@ -46,6 +52,7 @@ func userDataDir(appName string) string {
 	}
 }
 
+// readAll читает все задачи из JSON файла
 func (r *FileRepo) readAll() ([]models.Task, error) {
 	b, err := os.ReadFile(r.path)
 	if err != nil {
@@ -58,6 +65,7 @@ func (r *FileRepo) readAll() ([]models.Task, error) {
 	return tasks, nil
 }
 
+// writeAll записывает все задачи в JSON файл
 func (r *FileRepo) writeAll(tasks []models.Task) error {
 	b, err := json.MarshalIndent(tasks, "", "  ")
 	if err != nil {
@@ -66,6 +74,7 @@ func (r *FileRepo) writeAll(tasks []models.Task) error {
 	return os.WriteFile(r.path, b, 0o644)
 }
 
+// List возвращает список всех задач из файла
 func (r *FileRepo) List(ctx context.Context) ([]models.Task, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

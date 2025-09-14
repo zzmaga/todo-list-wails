@@ -6,6 +6,7 @@ import (
 	"todo-list-wails/backend/models"
 )
 
+// Get возвращает задачу по ID из файла
 func (r *FileRepo) Get(ctx context.Context, id string) (*models.Task, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -13,9 +14,9 @@ func (r *FileRepo) Get(ctx context.Context, id string) (*models.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, t := range tasks {
-		if t.ID == id {
-			tt := t
+	for _, task := range tasks {
+		if task.ID == id {
+			tt := task
 			return &tt, nil
 		}
 	}

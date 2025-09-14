@@ -10,11 +10,26 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 )
 
-//go:embed frontend/dist
 var assets embed.FS
 
 func main() {
-	app := backend.NewApp(backend.Config{AppName: "Wails To-Do"})
+	// Конфигурация приложения
+	config := backend.Config{
+		AppName: "Wails To-Do",
+		Database: backend.DatabaseConfig{
+			Type: "postgres",
+			Postgres: backend.PostgresConfig{
+				Host:     "localhost",
+				Port:     5432,
+				User:     "magjantastanov",
+				Password: "", // Без пароля для локальной разработки
+				DBName:   "todo_app",
+				SSLMode:  "disable",
+			},
+		},
+	}
+
+	app := backend.NewApp(config)
 
 	if err := wails.Run(&options.App{
 		Title:     "Wails To-Do",
